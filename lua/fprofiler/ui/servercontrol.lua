@@ -128,14 +128,28 @@ Update info when a different line is selected
 ---------------------------------------------------------------------------]]
 onUpdate({"server", "currentSelected"}, function(new)
     if not new or not new.info or not new.info.linedefined or not new.info.lastlinedefined or not new.info.short_src then return end
-
     net.Start("FProfile_getSource")
-        net.WriteString(tostring(new.func))
+		net.WriteString(tostring(new.func))
+		net.WriteString(new.info.short_src)
+		net.WriteUInt(new.info.linedefined, 16)
+		net.WriteUInt(new.info.lastlinedefined, 16)
+    net.SendToServer()
+end)
+
+onUpdate({"client", "currentSelected"}, function(new)
+    if not new or not new.info or not new.info.linedefined or not new.info.lastlinedefined or not new.info.short_src then return end
+    net.Start("FProfile_getSource")
+		net.WriteString(tostring(new.func))
+		net.WriteString(new.info.short_src)
+		net.WriteUInt(new.info.linedefined, 16)
+		net.WriteUInt(new.info.lastlinedefined, 16)
     net.SendToServer()
 end)
 
 net.Receive("FProfile_getSource", function()
-    update({"server", "sourceText"}, net.ReadString())
+	local code =  net.ReadString()
+    update({"server", "sourceText"}, code)
+    update({"client", "sourceText"}, code)
 end)
 
 
